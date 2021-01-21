@@ -1,0 +1,11 @@
+Package: themepack2background
+Version: 2.0-2
+Architecture: all
+Priority: extra
+Section: utils
+Maintainer: Mauricio Ferrari <m10ferrari1200@gmail.com>
+Requires: cabextract
+Description: Conversion of Windows theme files (desk)themepack for Linux packages. 
+ This software has as objective reuse Windows theme files themepack of
+ discontinued Windows 7, to transform them into useful wallpaper
+ installation packages for Linux.

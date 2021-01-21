@@ -1,0 +1,25 @@
+
+ThemePack2Background Versão 2.0 - Conversão de arquivos de tema do Windows "(desk)themepack"
+                                  para pacotes de wallpapers para Linux.
+
+Releases:
+
+
+[2.0] - 2021-01-19
+
+Recursos:
+	- Criação do themepack2rpm [2.0-1].
+	- Criação do themepack2deb [2.0-2].
+
+Funcioanlidades:
+	- Adicionado função de ajuste dos nomes dos wallpapers [2.0-1].
+	- Adicionado suporte ao KDE.
+	- Adicionado suporte ao MATE.
+	- Adicionado suporte ao XFCE.
+
+
+[1.0] - 2020-06-18
+
+Recursos:
+	- Criação do themepack2background.
+	- Criação do themepack2txz.

@@ -1,0 +1,178 @@
+#!/bin/bash
+
+##########################
+#                        #
+# ### README - PT_BR ### #
+#                        #
+################################################################################
+#                                                                              #
+#                                                                              #
+# themepack2background v2.0 - Conversão de arquivos de tema do Windows         #
+# themepack e deskthemepack para pacotes do Linux deb, rpm e txz.              #
+#                                                                              #
+# By Mauricio Ferrari                                                          #
+#                                                                              #
+#                                                                              #
+# Descrição:                                                                   #
+#                                                                              #
+# Esse software tem como objetivo de reutilizar os arquivos de tema do Windows #
+# themepack do descontinuado Windows 7, para transformá-los em pacotes úteis   #
+# de instalação de Wallpapers para o Linux.                                    #
+#                                                                              #
+# Os pacotes deskthemepack do Windows 8, 8.1 e 10, por ter a mesmo formato de  #
+# compactação "cab" e por ter sua estrutura similar, também poderão ser        #
+# convertidos em pacotes para serem instalados no Linux.                       #
+#                                                                              #
+#                                                                              #
+# Todos os Recursos:                                                           #
+#                                                                              #
+# themepack2background - Extrai as imagens dos pacotes (desk)themepack e       #
+#                        instala as imagens diretamente nos diretórios dos     # 
+#                        backgrounds das interfaces KDE, MATE e XFCE.          #
+#                                                                              #
+# themepack2deb - Converte pacotes (desk)themepack em pacotes deb.             # 
+# themepack2rpm - Converte pacotes (desk)themepack em pacotes rpm.             # 
+# themepack2txz - Converte pacotes (desk)themepack em pacotes txz.             #
+#                                                                              #
+# Sintaxe:                                                                     #
+#                                                                              #
+# themepack2background package.themepack                                       #
+# themepack2deb package.themepack                                              #
+# themepack2rpm package.themepack                                              #
+# themepack2txz package.themepack                                              #
+#                                                                              #
+#                                                                              #
+#                            ### Copyright 2021 ###                            #
+#                                                                              #
+#                                                                              #
+################################################################################
+
+##########################
+#                        #
+# ### README - EN_US ### #
+#                        #
+################################################################################
+#                                                                              #
+#                                                                              #
+# themepack2background v2.0 - Conversion of Windows theme files themepack      #
+# and deskthemepack for Linux packages deb, rpm e txz.                         #
+#                                                                              #
+# By Mauricio Ferrari                                                          #
+#                                                                              #
+#                                                                              #
+# Description:                                                                 #
+#                                                                              #
+# This software has as objective reuse Windows theme files themepack of        #
+# discontinued Windows 7, to transform them into useful wallpaper              #
+# installation packages for Linux.                                             #
+#                                                                              #
+# The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same   #
+# compression format "cab" and for having a similar structure, also may be     #
+# converted into packages to be installed on Linux.                            #
+#                                                                              #
+#                                                                              #
+# All Resources:                                                               #
+#                                                                              #
+# themepack2background - Extracts the images from packages (desk)themepack     #
+#                        and install the images directly in the background     # 
+#                        directories of the KDE, MATE and XFCE interfaces.     #
+#                                                                              #
+# themepack2deb - Convert packages (desk)themepack in packages deb.            # 
+# themepack2rpm - Convert packages (desk)themepack in packages rpm.            # 
+# themepack2txz - Convert packages (desk)themepack in packages txz.            #
+#                                                                              #
+# Sintax:                                                                      #
+#                                                                              #
+# themepack2background package.themepack                                       #
+# themepack2deb package.themepack                                              #
+# themepack2rpm package.themepack                                              #
+# themepack2txz package.themepack                                              #
+#                                                                              #
+#                                                                              #
+#                            ### Copyright 2021 ###                            #
+#                                                                              #
+#                                                                              #
+################################################################################
+
+noroot()
+{
+	echo -e "\n The $( basename $0 ) resource requires administrative privileges! \n"; exit 1
+}
+
+info()
+{
+	head -96 $( basename $0 ) | sed "1d"; exit 0
+}
+
+ajustname()
+{
+	cd $PKG/usr/share/xfce4/backdrops
+	for OLDNAME in `ls -1`; do
+		mv $OLDNAME $NAME-$OLDNAME
+	done
+}
+
+kdewall()
+{
+	cd /usr/share/wallpapers
+	ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
+		ln -s "$file" .
+	done
+}
+
+matewall()
+{
+	cd /usr/share/backgrounds/mate/$NAME
+	ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
+		ln -s "$file" .
+	done
+	mkdir -p /usr/share/mate-background-properties
+	cat << EOF > /usr/share/mate-background-properties/mate-$NAME.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "mate-wp-list.dtd">
+<wallpapers>
+EOF
+	ls -1 *.* | while read file; do
+	cat << EOF >> /usr/share/mate-background-properties/mate-$NAME.xml
+  <wallpaper deleted="false">
+    <name>$file</name>
+    <filename>/usr/share/backgrounds/mate/$NAME/$file</filename>
+    <pcolor>#27587E</pcolor>
+    <scolor>#627F5A</scolor>
+    <options>zoom</options>
+  </wallpaper>
+EOF
+	done
+	cat << EOF >> /usr/share/mate-background-properties/mate-$NAME.xml
+</wallpapers>
+EOF
+}
+
+
+xfcewall()
+{
+	cd /usr/share/backgrounds/xfce
+	ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
+		ln -s "$file" .
+	done
+}
+
+[ "$1" == ""  ] && info
+[ "$UID" != 0 ] && noroot
+
+for FILE in $* ; do
+	NAME=$( basename $FILE | cut -d '.' -f1 )
+	TMP=/tmp/$NAME
+	mkdir -p $TMP usr/share/backgrounds/mate/$NAME
+	cabextract -d $TMP $FILE
+	mv $TMP/D*/* /usr/share/xfce4/backdrops/
+	ajustname
+	chown -R root:root /usr/share/xfce4/backdrops/$NAME*.*
+	chmod 644 /usr/share/xfce4/backdrops/$NAME*.*
+	kdewall
+	matewall
+	xfcewall
+	rm -rf $TMP $PKG
+	cd $CWD
+done
+exit 0
