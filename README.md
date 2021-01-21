@@ -7,6 +7,7 @@
 This software has as objective reuse Windows theme files themepack of discontinued Windows 7, to transform them into useful wallpaper installation packages for Linux.
 
 The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same compression format "cab" and for having a similar structure, also may be converted into packages to be installed on Linux.
+<br/><br/>
 
 ### All Resources:
 
@@ -14,6 +15,7 @@ The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same compr
 2) **themepack2deb** - Convert packages (desk)themepack in deb packages.<br/>
 3) **themepack2rpm** - Convert packages (desk)themepack in rpm packages.<br/>
 4) **themepack2txz** - Convert packages (desk)themepack in txz packages.
+<br/><br/>
 
 ### Sintax:
 ```
@@ -22,6 +24,7 @@ $ themepack2deb package.themepack
 $ themepack2rpm package.themepack
 $ themepack2txz package.themepack
 ```
+<br/><br/>
 
 ### GNU General Public License
 
