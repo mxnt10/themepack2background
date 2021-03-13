@@ -28,9 +28,9 @@ find -L . \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
 install -D -m 0755 $CWD/general/$PRGNAM $PKG/usr/bin
-install -D -m 0755 $CWD/slackware/themepack2txz $PKG/usr/bin
+install -D -m 0755 $CWD/debian/themepack2deb $PKG/usr/bin
 
-cat $CWD/$PRGNAM.DebBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/$PRGNAM.debBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.debBuild
 cp -a $CWD/{LICENSE,INFO} $PKG/usr/doc/$PRGNAM-$VERSION
 
 cat $CWD/debian/control > $PKG/DEBIAN/control
