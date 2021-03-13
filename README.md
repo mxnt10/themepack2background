@@ -1,4 +1,4 @@
-# ThemePack2Background v2.0
+# ThemePack2Background v3.0
 *Conversion of Windows theme files themepack and deskthemepack for Linux packages DEB, RPM e TXZ*
 <br/><br/>
 
