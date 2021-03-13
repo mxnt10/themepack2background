@@ -7,7 +7,7 @@
 ################################################################################
 #                                                                              #
 #                                                                              #
-# themepack2background v2.0 - Conversão de arquivos de tema do Windows         #
+# themepack2background v3.0 - Conversão de arquivos de tema do Windows         #
 # themepack e deskthemepack para pacotes do Linux deb, rpm e txz.              #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -28,7 +28,8 @@
 #                                                                              #
 # themepack2background - Extrai as imagens dos pacotes (desk)themepack e       #
 #                        instala as imagens diretamente nos diretórios dos     # 
-#                        backgrounds das interfaces KDE, MATE e XFCE.          #
+#                        backgrounds das interfaces DDE, GNOME, KDE, MATE      #
+#                        e XFCE.                                               #
 #                                                                              #
 # themepack2deb - Converte pacotes (desk)themepack em pacotes deb.             # 
 # themepack2rpm - Converte pacotes (desk)themepack em pacotes rpm.             # 
@@ -40,6 +41,18 @@
 # themepack2deb package.themepack                                              #
 # themepack2rpm package.themepack                                              #
 # themepack2txz package.themepack                                              #
+#                                                                              #
+# Parâmetros:                                                                  #
+#                                                                              #
+#    --default       : Suporte ao KDE e o XFCE por padrão.                     #
+#                                                                              #  
+#    --enable-dde    : Habilitar suporte ao DDE.                               #
+#    --enable-mate   : Habilitar suporte ao MATE.                              #
+#    --enable-gnome  : Habilitar suporte ao GNOME.                             #
+#                                                                              #
+#    --disable-dde   : Desabilitar suporte ao DDE.                             #
+#    --disable-mate  : Desabilitar suporte ao MATE.                            #
+#    --disable-gnome : Desabilitar suporte ao GNOME.                           #
 #                                                                              #
 #                                                                              #
 #                            ### Copyright 2021 ###                            #
@@ -54,7 +67,7 @@
 ################################################################################
 #                                                                              #
 #                                                                              #
-# themepack2background v2.0 - Conversion of Windows theme files themepack      #
+# themepack2background v3.0 - Conversion of Windows theme files themepack      #
 # and deskthemepack for Linux packages deb, rpm e txz.                         #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -75,7 +88,8 @@
 #                                                                              #
 # themepack2background - Extracts the images from packages (desk)themepack     #
 #                        and install the images directly in the background     # 
-#                        directories of the KDE, MATE and XFCE interfaces.     #
+#                        directories of the DDE, GNOME, KDE, MATE and XFCE     #
+#                        interfaces.                                           #
 #                                                                              #
 # themepack2deb - Convert packages (desk)themepack in packages deb.            # 
 # themepack2rpm - Convert packages (desk)themepack in packages rpm.            # 
@@ -88,6 +102,18 @@
 # themepack2rpm package.themepack                                              #
 # themepack2txz package.themepack                                              #
 #                                                                              #
+# Parameters:                                                                  #
+#                                                                              #
+#    --default       : KDE and XFCE support by default.                        #
+#                                                                              #  
+#    --enable-dde    : Enable DDE support.                                     #
+#    --enable-mate   : Enable MATE support.                                    #
+#    --enable-gnome  : Enable GNOME support.                                   #
+#                                                                              #
+#    --disable-dde   : Disable DDE support.                                    #
+#    --disable-mate  : Disable MATE support.                                   #
+#    --disable-gnome : Disable GNOME support.                                  #
+#                                                                              #
 #                                                                              #
 #                            ### Copyright 2021 ###                            #
 #                                                                              #
@@ -99,21 +125,32 @@ ARCH=${ARCH:-noarch}
 VERSION=${VERSION:-1.0}
 RELEASE=${RELEASE:-1}
 
+DDE=enable
+MATE=enable
+GNOME=enable
+
+define_defaut()
+{
+	DDE=disable
+	MATE=disable
+	GNOME=disable
+}
+
 DISTRO=$( neofetch | grep OS | cut -d" " -f2 )
 [ "$DISTRO" == "" ] && DISTRO=$( grep ^NAME /etc/os-release | cut -d"=" -f2 )
 [ "$DISTRO" == "" ] && DISTRO=$( uname -s )
 
-noroot()
+fail_root()
 {
 	echo -e "\n The $( basename $0 ) resource requires administrative privileges! \n"; exit 1
 }
 
-info()
+info_view()
 {
-	head -96 $( basename $0 ) | sed "1d"; exit 0
+	head -122 $( basename $0 ) | sed "1d"; exit 0
 }
 
-ajustname()
+define_name()
 {
 	cd $PKG/usr/share/xfce4/backdrops
 	for OLDNAME in `ls -1`; do
@@ -121,7 +158,7 @@ ajustname()
 	done
 }
 
-specgen()
+spec_gen()
 {
 echo "Summary: Package gererated from $FILE, by $( basename $0 ).
 Name: $NAME-wall
@@ -145,19 +182,63 @@ exit
 %files
 
 %attr(0644, root, root) /usr/share/xfce4/backdrops/*
-/usr/share/mate-background-properties/
-/usr/share/wallpapers/
-/usr/share/backgrounds/mate/$NAME/
 /usr/share/backgrounds/xfce/
+/usr/share/wallpapers/" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
 
-%post
+[ "$DDE" == "enable" ] && echo "/usr/share/wallpapers/deepin/" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$MATE" == "enable" ] && echo "/usr/share/mate-background-properties/
+/usr/share/backgrounds/mate/$NAME/" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$GNOME" == "enable" ] && echo "/usr/share/gnome-background-properties/
+/usr/share/backgrounds/gnome/$NAME/
+" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+echo "%post
 
 cd /usr/share/wallpapers
 ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
 	ln -s \"\$file\" .
 done
 
-cd /usr/share/backgrounds/mate/$NAME
+cd /usr/share/backgrounds/xfce
+ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
+	ln -s \"\$file\" .
+done
+" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$DDE" == "enable" ] && echo "cd /usr/share/wallpapers/deepin
+ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
+	ln -s \"\$file\" .
+done
+" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$GNOME" == "enable" ] && echo "cd /usr/share/backgrounds/gnome/$NAME
+ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
+	ln -s \"\$file\" .
+done
+cat << EOF > /usr/share/gnome-background-properties/gnome-$NAME.xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE wallpapers SYSTEM \"gnome-wp-list.dtd\">
+<wallpapers>
+EOF
+ls -1 *.* | while read file; do
+cat << EOF >> /usr/share/gnome-background-properties/gnome-$NAME.xml
+  <wallpaper deleted=\"false\">
+    <name>\$file</name>
+    <filename>/usr/share/backgrounds/gnome/$NAME/\$file</filename>
+    <pcolor>#27587E</pcolor>
+    <scolor>#627F5A</scolor>
+    <options>zoom</options>
+  </wallpaper>
+EOF
+done
+cat << EOF >> /usr/share/gnome-background-properties/gnome-$NAME.xml
+</wallpapers>
+EOF
+" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$MATE" == "enable" ] && echo "cd /usr/share/backgrounds/mate/$NAME
 ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
 	ln -s \"\$file\" .
 done
@@ -180,45 +261,63 @@ done
 cat << EOF >> /usr/share/mate-background-properties/mate-$NAME.xml
 </wallpapers>
 EOF
+" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
 
-cd /usr/share/backgrounds/xfce
-ls -1 /usr/share/xfce4/backdrops/$NAME*.* | while read file; do
-	ln -s \"\$file\" .
-done
+echo "%postun
 
-%postun
-
-rm -r /usr/share/backgrounds/mate/$NAME
-rm /usr/share/mate-background-properties/mate-$NAME.xml
 rm /usr/share/backgrounds/xfce/$NAME*
-rm /usr/share/wallpapers/$NAME*" | tee $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+rm /usr/share/wallpapers/$NAME*" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$MATE" == "enable" ] && echo "rm -r /usr/share/backgrounds/mate/$NAME
+rm /usr/share/mate-background-properties/mate-$NAME.xml" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$GNOME" == "enable" ] && echo "rm -r /usr/share/backgrounds/gnome/$NAME
+rm /usr/share/mate-background-properties/gnome-$NAME.xml"  | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
+
+[ "$DDE" == "enable" ] && echo "rm /usr/share/wallpapers/deepin/$NAME*" | tee -a $NPG/SPECS/$NAME-$VERSION.spec > /dev/null
 }
 
-createrpm()
+create_rpm()
 {
 	cd $NPG/SPECS; rpmbuild -bb $NAME-$VERSION.spec
 	cd $CWD; cp $NPG/RPMS/noarch/$NAME-wall-$VERSION-$RELEASE.$ARCH.rpm .
 	chown -R 1000:users $NAME-wall-$VERSION-$RELEASE.$ARCH.rpm
 }
 
-[ "$1" == ""  ] && info
-[ "$UID" != 0 ] && noroot
+[ "$1" == ""  ] && info_view
+[ "$UID" != 0 ] && fail_root
 
-for FILE in $* ; do
+PARM=$( echo $* | sed "s/ /&\n/g" | grep "\-\-"    )
+LIST=$( echo $* | sed "s/ /&\n/g" | grep -v "\-\-" )
+
+for OPTION in $PARM; do
+	[ "$OPTION" == "--default"       ] && define_defaut
+	[ "$OPTION" == "--enable-dde"    ] && DDE=enable
+	[ "$OPTION" == "--enable-mate"   ] && MATE=enable
+	[ "$OPTION" == "--enable-gnome"  ] && GNOME=enable
+	[ "$OPTION" == "--disable-dde"   ] && DDE=disable
+	[ "$OPTION" == "--disable-mate"  ] && MATE=disable
+	[ "$OPTION" == "--disable-gnome" ] && GNOME=disable
+done
+
+for FILE in $LIST; do
 	NAME=$( basename $FILE | cut -d '.' -f1 )
 	NPG=~/rpmbuild
 	PKG=/tmp/package-$NAME
 	TMP=/tmp/$NAME
-	mkdir -p $TMP $PKG/usr/share/{backgrounds/{mate/$NAME,xfce},xfce4/backdrops,wallpapers,mate-background-properties} $NPG/SPECS
+	mkdir -p $TMP $PKG/usr/share/{backgrounds/xfce,xfce4/backdrops,wallpapers} $NPG/SPECS
+	[ "$DDE"   == "enable" ] && mkdir -p $PKG/usr/share/wallpapers/deepin
+	[ "$MATE"  == "enable" ] && mkdir -p $PKG/usr/share/{backgrounds/mate/$NAME,mate-background-properties}
+	[ "$GNOME" == "enable" ] && mkdir -p $PKG/usr/share/{backgrounds/gnome/$NAME,gnome-background-properties}
 	cabextract -d $TMP $FILE
 	mv $TMP/D*/* $PKG/usr/share/xfce4/backdrops/
-	ajustname
+	define_name
 	chown -R root:root $PKG
 	find -L $PKG \
 		\( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
 		-o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
-	specgen
-	createrpm
+	spec_gen
+	create_rpm
 	rm -rf $TMP $PKG $NPG
 done
 exit 0

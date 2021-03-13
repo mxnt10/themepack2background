@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# Slackware build script for themepack2background
+# Debian build script for themepack2background
 
 # Copyright 2021 Mauricio Ferrari <m10ferrari1200@gmail.com>
 # All rights reserved.
 
 PRGNAM=themepack2background
 VERSION=${VERSION:-3.0}
-BUILD=${BUILD:-1}
+RELEASE=${RELEASE:-1}
 
-ARCH=noarch
+ARCH=all
 
 CWD=$PWD
 PKG=/tmp/package-$PRGNAM
@@ -17,7 +17,7 @@ PKG=/tmp/package-$PRGNAM
 set -e
 
 rm -rf $PKG
-mkdir -p $PKG/{install,usr/{bin,doc/$PRGNAM-$VERSION}}
+mkdir -p $PKG/{DEBIAN,usr/{bin,doc/$PRGNAM-$VERSION}}
 
 cd $PKG
 chown -R root:root .
@@ -30,11 +30,12 @@ find -L . \
 install -D -m 0755 $CWD/general/$PRGNAM $PKG/usr/bin
 install -D -m 0755 $CWD/slackware/themepack2txz $PKG/usr/bin
 
-cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+cat $CWD/$PRGNAM.DebBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 cp -a $CWD/{LICENSE,INFO} $PKG/usr/doc/$PRGNAM-$VERSION
 
-cat $CWD/slackware/slack-desc > $PKG/install/slack-desc
+cat $CWD/debian/control > $PKG/DEBIAN/control
 
-/sbin/makepkg -l y -c n $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+cd $CWD
+dpkg-deb -b $PKG ${PRGNAM}_$VERSION-${RELEASE}_$ARCH.deb
 
-cd $CWD; rm -rf $PKG
+rm -rf $PKG

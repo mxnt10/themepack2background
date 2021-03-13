@@ -1,22 +1,43 @@
 # ChangeLog
+All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+
+## [ 3.0-1 ] - 2021-03-13 ################################################
+
+### Upgraded / Atualizado
+ - Script:
+	- Upgrade on all scripts:
+		- DDE Support.
+		- GNOME Support.
+	- Added parameters:
+		--default (for KDE and XFCE)
+		--disable-dde
+		--disable-gnome
+		--disable-mate
+		--enable-dde
+		--enable-gnome
+		--enable-mate
+###
+
+##########################################################################
 
 
 ## [ 2.0-2 ] - 2021-01-20 ################################################
 
-### Adicionado
+### Added / Adicionado
  - Scripts:
-	- Adicionado o script themepack2deb.
+	- Added script themepack2deb.
  - Build:
-	- Adicionado o control para a geração do pacote deb.
-	- Adicionado o themepack2background.DebBuild para geração do pacote deb.
+	- Added control for deb packages generation.
+	- Added themepack2background.DebBuild for deb packages generation.
 ###
 
-### Modificado
+### Changed / Modificado
  - Scripts:
-	- Modificado o script themepack2rpm.
-	- Modificado o script themepack2txz.
-	- Modificado o script themepack2background.
+	- Changed script themepack2rpm.
+	- Changed script themepack2txz.
+	- Changed script themepack2background.
 ###
 
 ##########################################################################
@@ -26,10 +47,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Adicionado
  - Scripts:
-	- Adicionado o script themepack2rpm.
+	- Added script themepack2rpm.
  - Build:
-	- Adicionado themepack2background.spec para a geração do pacote rpm.
-	- Adicionado o themepack2background.rpmBuild para geração do pacote rpm.
+	- Added themepack2background.spec for rpm packages generation.
+	- Added themepack2background.rpmBuild for rpm packages generation.
 ###
 
 ##########################################################################
@@ -37,20 +58,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ## [ 2.0 ] - 2021-01-16 ##################################################
 
-### Adicionado
+### Added / Adicionado
  - Scripts:
-	- Adicionado o script themepack2txz.
+	- Added script themepack2txz.
  - Build:
-	- Adicionado slack-desk para a geração do pacote txz.
-	- Adicionado o SlackBuilds para a geração do pacote txz.
+	- Added slack-desk for txz packages generation.
+	- Added SlackBuilds for txz packages generation.
 ###
 
-### Atualizado
+### Upgraded / Atualizado
  - Scripts:
-	- Atualização em themepack2background:
-		- Suporte KDE.
-		- Suporte MATE.
-		- Suporte XFCE.
+	- Upgrade on themepack2background:
+		- KDE support.
+		- MATE support.
+		- XFCE support.
 ###
 
 ##########################################################################
@@ -58,8 +79,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ## [ 1.0 ] - 2020-06-18 ##################################################
 
-### Adicionado
- - Adicionado script themepack2background.
+### Added / Adicionado
+ - Added script themepack2background.
 ###
 
 ##########################################################################

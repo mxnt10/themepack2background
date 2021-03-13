@@ -1,25 +1,47 @@
 
-ThemePack2Background Versão 2.0 - Conversão de arquivos de tema do Windows "(desk)themepack"
-                                  para pacotes de wallpapers para Linux.
+themepack2background v3.0 - Conversion of Windows theme files themepack
+                            and deskthemepack for Linux packages deb, rpm e txz.
 
-Releases:
-
-
-[2.0] - 2021-01-19
-
-Recursos:
-	- Criação do themepack2rpm [2.0-1].
-	- Criação do themepack2deb [2.0-2].
-
-Funcioanlidades:
-	- Adicionado função de ajuste dos nomes dos wallpapers [2.0-1].
-	- Adicionado suporte ao KDE.
-	- Adicionado suporte ao MATE.
-	- Adicionado suporte ao XFCE.
+By Mauricio Ferrari
 
 
-[1.0] - 2020-06-18
+Description: 
 
-Recursos:
-	- Criação do themepack2background.
-	- Criação do themepack2txz.
+This software has as objective reuse Windows theme files themepack of
+discontinued Windows 7, to transform them into useful wallpaper
+installation packages for Linux.
+
+The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same
+compression format "cab" and for having a similar structure, also may be
+converted into packages to be installed on Linux.
+
+
+All Resources:
+
+themepack2background - Extracts the images from packages (desk)themepack
+                       and install the images directly in the background
+                       directories of the DDE, GNOME, KDE, MATE and XFCE
+                       interfaces.
+
+themepack2deb - Convert packages (desk)themepack in packages deb.
+themepack2rpm - Convert packages (desk)themepack in packages rpm.
+themepack2txz - Convert packages (desk)themepack in packages txz.
+
+Sintax:
+
+# themepack2background <parameters> package.themepack 
+# themepack2deb <parameters> package.themepack
+# themepack2rpm <parameters> package.themepack
+# themepack2txz <parameters> package.themepack
+
+Parameters:
+
+	--default       : KDE and XFCE support by default.
+	
+	--enable-dde    : Enable DDE support.
+	--enable-mate   : Enable MATE support.
+	--enable-gnome  : Enable GNOME support.
+
+	--disable-dde   : Disable DDE support.
+	--disable-mate  : Disable MATE support.
+	--disable-gnome : Disable GNOME support.

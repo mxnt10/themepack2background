@@ -11,7 +11,7 @@ The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same compr
 
 ### All Resources
 
-1) **themepack2background** - Extracts the images from packages (desk)themepack and install the images directly in the background directories of the KDE, MATE and XFCE interfaces.<br/>
+1) **themepack2background** - Extracts the images from packages (desk)themepack and install the images directly in the background directories of the DDE, KDE, GNOME, MATE and XFCE interfaces.<br/>
 2) **themepack2deb** - Convert packages (desk)themepack in deb packages.<br/>
 3) **themepack2rpm** - Convert packages (desk)themepack in rpm packages.<br/>
 4) **themepack2txz** - Convert packages (desk)themepack in txz packages.
@@ -19,10 +19,24 @@ The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same compr
 
 ### Sintax
 ```
-$ themepack2background package.themepack
-$ themepack2deb package.themepack
-$ themepack2rpm package.themepack
-$ themepack2txz package.themepack
+# themepack2background package.themepack
+# themepack2deb package.themepack
+# themepack2rpm package.themepack
+# themepack2txz package.themepack
+```
+<br/><br/>
+
+### Parameters
+```
+--default       : KDE and XFCE support by default.
+
+--enable-dde    : Enable DDE support.
+--enable-mate   : Enable MATE support.
+--enable-gnome  : Enable GNOME support.
+
+--disable-dde   : Disable DDE support.
+--disable-mate  : Disable MATE support.
+--disable-gnome : Disable GNOME support.
 ```
 <br/><br/>
 
