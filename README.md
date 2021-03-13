@@ -18,16 +18,16 @@ The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same compr
 <br/><br/>
 
 ### Sintax
-```
-# themepack2background package.themepack
-# themepack2deb package.themepack
-# themepack2rpm package.themepack
-# themepack2txz package.themepack
+```sh
+# themepack2background <parameters> package.themepack
+# themepack2deb <parameters> package.themepack
+# themepack2rpm <parameters> package.themepack
+# themepack2txz <parameters> package.themepack
 ```
 <br/><br/>
 
 ### Parameters
-```
+```sh
 --default       : KDE and XFCE support by default.
 
 --enable-dde    : Enable DDE support.
