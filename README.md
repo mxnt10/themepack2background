@@ -18,7 +18,7 @@ The packages deskthemepack of the Windows 8, 8.1 e 10, for having the same compr
 <br/><br/>
 
 ### Sintax
-```sh
+```
 # themepack2background <parameters> package.themepack
 # themepack2deb <parameters> package.themepack
 # themepack2rpm <parameters> package.themepack
