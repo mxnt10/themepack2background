@@ -1,13 +1,8 @@
 #!/bin/bash
 
-##########################
-#                        #
-# ### README - PT_BR ### #
-#                        #
-################################################################################
+## ### README - PT_BR ### ######################################################
 #                                                                              #
-#                                                                              #
-# themepack2background v3.0 - Conversão de arquivos de tema do Windows         #
+# themepack2background v3.1 - Conversão de arquivos de tema do Windows         #
 # themepack e deskthemepack para pacotes do Linux deb, rpm e txz.              #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -27,12 +22,12 @@
 # Todos os Recursos:                                                           #
 #                                                                              #
 # themepack2background - Extrai as imagens dos pacotes (desk)themepack e       #
-#                        instala as imagens diretamente nos diretórios dos     # 
+#                        instala as imagens diretamente nos diretórios dos     #
 #                        backgrounds das interfaces DDE, GNOME, KDE, MATE      #
 #                        e XFCE.                                               #
 #                                                                              #
-# themepack2deb - Converte pacotes (desk)themepack em pacotes deb.             # 
-# themepack2rpm - Converte pacotes (desk)themepack em pacotes rpm.             # 
+# themepack2deb - Converte pacotes (desk)themepack em pacotes deb.             #
+# themepack2rpm - Converte pacotes (desk)themepack em pacotes rpm.             #
 # themepack2txz - Converte pacotes (desk)themepack em pacotes txz.             #
 #                                                                              #
 # Sintaxe:                                                                     #
@@ -44,30 +39,22 @@
 #                                                                              #
 # Parâmetros:                                                                  #
 #                                                                              #
-#    --default       : Suporte ao KDE e o XFCE por padrão.                     #
-#                                                                              #  
-#    --enable-dde    : Habilitar suporte ao DDE.                               #
-#    --enable-mate   : Habilitar suporte ao MATE.                              #
-#    --enable-gnome  : Habilitar suporte ao GNOME.                             #
+#     --default       : Suporte ao KDE e o XFCE por padrão.                    #
+#     --enable-dde    : Habilitar suporte ao DDE.                              #
+#     --enable-mate   : Habilitar suporte ao MATE.                             #
+#     --enable-gnome  : Habilitar suporte ao GNOME.                            #
+#     --disable-dde   : Desabilitar suporte ao DDE.                            #
+#     --disable-mate  : Desabilitar suporte ao MATE.                           #
+#     --disable-gnome : Desabilitar suporte ao GNOME.                          #
 #                                                                              #
-#    --disable-dde   : Desabilitar suporte ao DDE.                             #
-#    --disable-mate  : Desabilitar suporte ao MATE.                            #
-#    --disable-gnome : Desabilitar suporte ao GNOME.                           #
+# Todas as DEs estão ativadas por padrão.                                      #
 #                                                                              #
-#                                                                              #
-#                            ### Copyright 2021 ###                            #
-#                                                                              #
-#                                                                              #
-################################################################################
+############################ ### Copyleft 2021  ### ############################
 
-##########################
-#                        #
-# ### README - EN_US ### #
-#                        #
-################################################################################
+
+## ### README - EN_US ### ######################################################
 #                                                                              #
-#                                                                              #
-# themepack2background v3.0 - Conversion of Windows theme files themepack      #
+# themepack2background v3.1 - Conversion of Windows theme files themepack      #
 # and deskthemepack for Linux packages deb, rpm e txz.                         #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -91,8 +78,8 @@
 #                        directories of the DDE, GNOME, KDE, MATE and XFCE     #
 #                        interfaces.                                           #
 #                                                                              #
-# themepack2deb - Convert packages (desk)themepack in packages deb.            # 
-# themepack2rpm - Convert packages (desk)themepack in packages rpm.            # 
+# themepack2deb - Convert packages (desk)themepack in packages deb.            #
+# themepack2rpm - Convert packages (desk)themepack in packages rpm.            #
 # themepack2txz - Convert packages (desk)themepack in packages txz.            #
 #                                                                              #
 # Sintax:                                                                      #
@@ -104,182 +91,163 @@
 #                                                                              #
 # Parameters:                                                                  #
 #                                                                              #
-#    --default       : KDE and XFCE support by default.                        #
-#                                                                              #  
-#    --enable-dde    : Enable DDE support.                                     #
-#    --enable-mate   : Enable MATE support.                                    #
-#    --enable-gnome  : Enable GNOME support.                                   #
+#     --default       : KDE and XFCE support by default.                       #
+#     --enable-dde    : Enable DDE support.                                    #
+#     --enable-mate   : Enable MATE support.                                   #
+#     --enable-gnome  : Enable GNOME support.                                  #
+#     --disable-dde   : Disable DDE support.                                   #
+#     --disable-mate  : Disable MATE support.                                  #
+#     --disable-gnome : Disable GNOME support.                                 #
 #                                                                              #
-#    --disable-dde   : Disable DDE support.                                    #
-#    --disable-mate  : Disable MATE support.                                   #
-#    --disable-gnome : Disable GNOME support.                                  #
+# All DEs are enabled by default.                                              #
 #                                                                              #
-#                                                                              #
-#                            ### Copyright 2021 ###                            #
-#                                                                              #
-#                                                                              #
-################################################################################
+############################ ### Copyleft 2021  ### ############################
 
-CWD=$PWD
-ARCH=${ARCH:-noarch}
-VERSION=${VERSION:-1.0}
-BUILD=${BUILD:-1theme}
+cwd=$PWD
+arch=noarch
+version=${version:-1.0}
+build=${build:-1theme}
 
 DDE=enable
 MATE=enable
 GNOME=enable
 
-define_defaut()
-{
-	DDE=disable
-	MATE=disable
-	GNOME=disable
-}
-
-DISTRO=$( neofetch | grep OS | cut -d" " -f2 )
-[ "$DISTRO" == "" ] && DISTRO=$( grep ^NAME /etc/os-release | cut -d"=" -f2 )
-[ "$DISTRO" == "" ] && DISTRO=$( uname -s )
-
-fail_root()
-{
-	echo -e "\n The $( basename $0 ) resouce requires administrative privileges! \n"; exit 1
-}
-
-info_view()
-{
-	head -122 $( basename $0 ) | sed "1d"; exit 0
-}
-
 define_name()
 {
-	cd $PKG/usr/share/xfce4/backdrops
-	for OLDNAME in `ls -1`; do
-		mv $OLDNAME $NAME-$OLDNAME
-	done
-}
-
-dde_wall()
-{
-	mkdir -p $PKG/usr/share/wallpapers/deepin
-	cd $PKG/usr/share/wallpapers/deepin
-	ls -1 ../../xfce4/backdrops/*.* | while read file; do
-		ln -s "$file" .
+	cd $default_dir
+	for oldname in *; do
+		mv $oldname $name-$oldname
 	done
 }
 
 gnome_wall()
 {
-	mkdir -p $PKG/usr/share/backgrounds/gnome/$NAME
-	cd $PKG/usr/share/backgrounds/gnome/$NAME
-	ls -1 ../../../xfce4/backdrops/*.* | while read file; do
-		ln -s "$file" .
+	mkdir -p $pkg/usr/share/backgrounds/gnome/$name
+	cd $pkg/usr/share/backgrounds/gnome/$name
+
+	for img in ../../../xfce4/backdrops/*; do
+		ln -s "$img" .
 	done
-	mkdir -p $PKG/usr/share/gnome-background-properties
-	cat << EOF > $PKG/usr/share/gnome-background-properties/gnome-$NAME.xml
-<?xml version="1.0" encoding="UTF-8"?>
+
+	mkdir -p $pkg/usr/share/gnome-background-properties
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
-<wallpapers>
-EOF
-	ls -1 *.* | while read file; do
-	cat << EOF >> $PKG/usr/share/gnome-background-properties/gnome-$NAME.xml
-  <wallpaper deleted="false">
-    <name>$file</name>
-    <filename>/usr/share/backgrounds/gnome/$NAME/$file</filename>
+<wallpapers>' > $pkg/usr/share/gnome-background-properties/gnome-$name.xml
+
+for img in *; do
+	echo "  <wallpaper deleted=\"false\">
+    <name>$img</name>
+    <filename>/usr/share/backgrounds/gnome/$name/$img</filename>
     <pcolor>#27587E</pcolor>
     <scolor>#627F5A</scolor>
     <options>zoom</options>
-  </wallpaper>
-EOF
-	done
-	cat << EOF >> $PKG/usr/share/gnome-background-properties/gnome-$NAME.xml
-</wallpapers>
-EOF
+  </wallpaper>" >> $pkg/usr/share/gnome-background-properties/gnome-$name.xml
+done
+
+	echo '</wallpapers>' >> $pkg/usr/share/gnome-background-properties/gnome-$name.xml
 }
 
 mate_wall()
 {
-	mkdir -p $PKG/usr/share/backgrounds/mate/$NAME
-	cd $PKG/usr/share/backgrounds/mate/$NAME
-	ls -1 ../../../xfce4/backdrops/*.* | while read file; do
-		ln -s "$file" .
+	mkdir -p $pkg/usr/share/backgrounds/mate/$name
+	cd $pkg/usr/share/backgrounds/mate/$name
+
+	for img in ../../../xfce4/backdrops/*; do
+		ln -s "$img" .
 	done
-	mkdir -p $PKG/usr/share/mate-background-properties
-	cat << EOF > $PKG/usr/share/mate-background-properties/mate-$NAME.xml
-<?xml version="1.0" encoding="UTF-8"?>
+
+	mkdir -p $pkg/usr/share/mate-background-properties
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE wallpapers SYSTEM "mate-wp-list.dtd">
-<wallpapers>
-EOF
-	ls -1 *.* | while read file; do
-	cat << EOF >> $PKG/usr/share/mate-background-properties/mate-$NAME.xml
-  <wallpaper deleted="false">
-    <name>$file</name>
-    <filename>/usr/share/backgrounds/mate/$NAME/$file</filename>
+<wallpapers>' > $pkg/usr/share/mate-background-properties/mate-$name.xml
+
+for img in *; do
+	echo "    <wallpaper deleted=\"false\">
+    <name>$img</name>
+    <filename>/usr/share/backgrounds/mate/$name/$img</filename>
     <pcolor>#27587E</pcolor>
     <scolor>#627F5A</scolor>
     <options>zoom</options>
-  </wallpaper>
-EOF
-	done
-	cat << EOF >> $PKG/usr/share/mate-background-properties/mate-$NAME.xml
-</wallpapers>
-EOF
+  </wallpaper>" >> $pkg/usr/share/mate-background-properties/mate-$name.xml
+done
+
+	echo '</wallpapers>' >> $pkg/usr/share/mate-background-properties/mate-$name.xml
 }
 
 kde_wall()
 {
-	cd $PKG/usr/share/wallpapers
-	ls -1 ../xfce4/backdrops/*.* | while read file; do
-		ln -s "$file" .
+	kdedir=$pkg/usr/share/wallpapers
+
+	[ "$DDE" == "enable" ] && {
+		kdedir+=/deepin
+		bdir=../
+		mkdir -p $kdedir
+	}
+
+	cd $kdedir
+	for img in $bdir../xfce4/backdrops/*; do
+		ln -s "$img" .
 	done
 }
 
 xfce_wall()
 {
-	cd $PKG/usr/share/backgrounds/xfce
-	ls -1 ../../xfce4/backdrops/*.* | while read file; do
-		ln -s "$file" .
+	cd $pkg/usr/share/backgrounds/xfce
+	for img in ../../xfce4/backdrops/*; do
+		ln -s "$img" .
 	done
 }
 
 slackdesc_gen()
 {
-	NUM=$(( "`echo $NAME | wc -c`" - 1 ))
-	DELM=$( printf "%${NUM}s" " " )
-echo "# HOW TO EDIT THIS FILE:
-# The \"handy ruler\" below makes it easier to edit a package description.
-# Line up the first '|' above the ':' following the base package name, and
-# the '|' on the right side marks the last column you can put a character in.
-# You must make exactly 11 lines for the formatting to be correct.  It's also
-# customary to leave one space after the ':' except on otherwise blank lines.
-
-$DELM     |-----handy-ruler------------------------------------------------------|
-$NAME-wall: $NAME-wall (wallpaper for Slackware)
-$NAME-wall:
-$NAME-wall: Gererated from $FILE,
-$NAME-wall: by $( basename $0 ).
-$NAME-wall:
-$NAME-wall: Package created in $DISTRO. 
-$NAME-wall:
-$NAME-wall:
-$NAME-wall:
-$NAME-wall:
-$NAME-wall:" | tee $PKG/install/slack-desc > /dev/null
+	delm=$( printf "%${#name}s" " " )
+	echo "
+$delm     |-----handy-ruler------------------------------------------------------|
+$name-wall: $name-wall (wallpaper for Slackware)
+$name-wall:
+$name-wall: Gererated from $file,
+$name-wall: by ${0##*/}.
+$name-wall:
+$name-wall: Package created in $distro. 
+$name-wall:
+$name-wall:
+$name-wall:
+$name-wall:
+$name-wall:" > $pkg/install/slack-desc
 }
 
 create_txz()
 {
-	cd $PKG; /sbin/makepkg -l y -c n $CWD/$NAME-wall-$VERSION-$ARCH-$BUILD.txz
-	chown -R 1000:users $CWD/$NAME-wall-$VERSION-$ARCH-$BUILD.txz
+	cd $pkg
+	/sbin/makepkg -l y -c n $cwd/$name-wall-$version-$arch-$build.txz
+	chown -R 1000:users $cwd/$name-wall-$version-$arch-$build.txz
 }
 
-[ "$1" == ""  ] && info_view
-[ "$UID" != 0 ] && fail_root
+: "$*"; input=$( echo -e "${_// /\\n}" )
+args=$( grep    "\-\-" <<< $input )
+parm=$( grep -v "\-\-" <<< $input )
 
-PARM=$( echo $* | sed "s/ /&\n/g" | grep "\-\-"    )
-LIST=$( echo $* | sed "s/ /&\n/g" | grep -v "\-\-" )
+: "$( grep ^NAME /etc/os-release )"; : "${_#*=}"; distro=${_%%[ ]*}
+[ "$distro" == "" ] && distro=$( uname -s )
 
-for OPTION in $PARM; do
-	[ "$OPTION" == "--default"       ] && define_defaut
+[ ! "$parm" ] && {
+	: "$( head -105 $0 )"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"
+	exit 0
+}
+
+[ "$UID" != 0 ] && {
+	echo -e "\n\e[31mThe ${0##*/} resouce requires administrative privileges!\e[m\n" >&2
+	exit 1
+}
+
+for OPTION in $args; do
+
+	[ "$OPTION" == "--default" ] && {
+		DDE=disable
+		MATE=disable
+		GNOME=disable
+	}
+	
 	[ "$OPTION" == "--enable-dde"    ] && DDE=enable
 	[ "$OPTION" == "--enable-mate"   ] && MATE=enable
 	[ "$OPTION" == "--enable-gnome"  ] && GNOME=enable
@@ -288,26 +256,38 @@ for OPTION in $PARM; do
 	[ "$OPTION" == "--disable-gnome" ] && GNOME=disable
 done
 
-for FILE in $LIST; do
-	NAME=$( basename $FILE | cut -d '.' -f1 )
-	PKG=/tmp/package-$NAME
-	TMP=/tmp/$NAME
-	mkdir -p $TMP $PKG/{install,usr/share/{backgrounds/xfce,xfce4/backdrops,wallpapers}}
-	cabextract -d $TMP $FILE
-	mv $TMP/D*/* $PKG/usr/share/xfce4/backdrops/
+for file in $parm; do
+
+	[ ! -e $file ] && {
+		echo -e "\n\e[31mThe \"$file\" file was not found!\e[m\n" >&2
+		continue
+	}
+
+	: "${file##*/}"; name="${_%%.*}"
+	pkg=/tmp/package-$name
+	tmp=/tmp/$name
+	default_dir=$pkg/usr/share/xfce4/backdrops/
+	mkdir -p $tmp $pkg/{install,usr/share/{backgrounds/xfce,xfce4/backdrops,wallpapers}}
+	cabextract -d $tmp $file
+	
+	[ "$?" != 0 ] && {
+		echo -e "\n\e[31mThe \"$file\" file is invalid!\e[m\n" >&2
+		rm -rf $tmp $pkg
+		continue
+	}
+	
+	mv $tmp/DesktopBackground/* $default_dir
 	define_name
-	chown -R root:root $PKG
-	find -L $PKG \
-		\( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
-		-o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
-	[ "$DDE"   == "enable" ] && dde_wall
+	chown -R root:root $pkg
+	chmod -R u+w,go+r-w,a+X-s $pkg
 	[ "$MATE"  == "enable" ] && mate_wall
 	[ "$GNOME" == "enable" ] && gnome_wall
 	kde_wall
 	xfce_wall
 	slackdesc_gen
 	create_txz
-	rm -rf $TMP $PKG
-	cd $CWD
+	rm -rf $tmp $pkg
+	cd $cwd
 done
+
 exit 0

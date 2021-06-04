@@ -3,6 +3,33 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 3.1-1 ] - 2021-06-01 ################################################
+
+### Added / Adicionado
+	- themepack2txz:
+		- Verification of invalid and not found files.
+
+### Changed / Modificado
+ - Script:
+	- Performance optimization for all scripts.
+	- Use of parameter expansion.
+###
+
+### Fixed / Corrigido
+ - Script:
+	- themepack2background:
+		- Fix function define_name.
+	- Fixed on all scripts:
+		- Fix function info_view.
+	- themepack2deb and themepack2txz:
+		- Wallpaper being displayed twice in KDE with DDE enabled fixed.
+	- themepack2txz:
+		- Help not displayed when parameter was passed without a file.
+###
+
+##########################################################################
+
+
 ## [ 3.0-1 ] - 2021-03-13 ################################################
 
 ### Upgraded / Atualizado
