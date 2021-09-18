@@ -1,7 +1,7 @@
 Summary: Convert themepack file to Slackware package.
 
 Name: themepack2background
-Version: 3.1
+Version: 3.2
 Release: 1
 
 BuildArch: noarch
@@ -20,13 +20,13 @@ Convert themepack file of the Windows 7 and deskthemepack of the Windows 8, 8.1 
 %prep
 
 echo “BUILDROOT = $RPM_BUILD_ROOT“
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,doc/themepack2background-3.1}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,doc/themepack2background-3.2}
 mv ../themepack2background $RPM_BUILD_ROOT/usr/bin
 mv ../themepack2rpm $RPM_BUILD_ROOT/usr/bin
-mv ../LICENSE $RPM_BUILD_ROOT/usr/doc/themepack2background-3.1
-mv ../INFO $RPM_BUILD_ROOT/usr/doc/themepack2background-3.1
+mv ../LICENSE $RPM_BUILD_ROOT/usr/doc/themepack2background-3.2
+mv ../INFO $RPM_BUILD_ROOT/usr/doc/themepack2background-3.2
 
 %files
 
 %attr(0755, root, root) /usr/bin/*
-%attr(0644, root, root) /usr/doc/themepack2background-3.1/*
+%attr(0644, root, root) /usr/doc/themepack2background-3.2/*

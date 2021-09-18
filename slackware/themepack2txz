@@ -2,7 +2,7 @@
 
 ## ### README - PT_BR ### ######################################################
 #                                                                              #
-# themepack2background v3.1 - Conversão de arquivos de tema do Windows         #
+# themepack2background v3.2 - Conversão de arquivos de tema do Windows         #
 # themepack e deskthemepack para pacotes do Linux deb, rpm e txz.              #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -54,7 +54,7 @@
 
 ## ### README - EN_US ### ######################################################
 #                                                                              #
-# themepack2background v3.1 - Conversion of Windows theme files themepack      #
+# themepack2background v3.2 - Conversion of Windows theme files themepack      #
 # and deskthemepack for Linux packages deb, rpm e txz.                         #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -103,14 +103,32 @@
 #                                                                              #
 ############################ ### Copyleft 2021  ### ############################
 
+
+# ### Variables for package generate. ###
+
 cwd=$PWD
 arch=noarch
 version=${version:-1.0}
-build=${build:-1theme}
+build=${build:-_mxnt}
+
+
+# ### Default values. ###
 
 DDE=enable
 MATE=enable
 GNOME=enable
+
+
+# ### Info function. ###
+
+info_view() 
+{
+	: "$( head -105 $0 )"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"
+	exit 0
+}
+
+
+# ### Add package name in the names for image files. ###
 
 define_name()
 {
@@ -119,6 +137,9 @@ define_name()
 		mv $oldname $name-$oldname
 	done
 }
+
+
+# ### Gnome support. ###
 
 gnome_wall()
 {
@@ -147,6 +168,9 @@ done
 	echo '</wallpapers>' >> $pkg/usr/share/gnome-background-properties/gnome-$name.xml
 }
 
+
+# ### Mate support. ###
+
 mate_wall()
 {
 	mkdir -p $pkg/usr/share/backgrounds/mate/$name
@@ -174,6 +198,9 @@ done
 	echo '</wallpapers>' >> $pkg/usr/share/mate-background-properties/mate-$name.xml
 }
 
+
+# ### KDE and DDE support. ###
+
 kde_wall()
 {
 	kdedir=$pkg/usr/share/wallpapers
@@ -190,6 +217,9 @@ kde_wall()
 	done
 }
 
+
+# ### XFCE support. ###
+
 xfce_wall()
 {
 	cd $pkg/usr/share/backgrounds/xfce
@@ -197,6 +227,9 @@ xfce_wall()
 		ln -s "$img" .
 	done
 }
+
+
+# ### Generate slack-desc file. ###
 
 slackdesc_gen()
 {
@@ -216,47 +249,68 @@ $name-wall:
 $name-wall:" > $pkg/install/slack-desc
 }
 
+
+# ### Create TXZ package. ###
+
 create_txz()
 {
 	cd $pkg
-	/sbin/makepkg -l y -c n $cwd/$name-wall-$version-$arch-$build.txz
-	chown -R 1000:users $cwd/$name-wall-$version-$arch-$build.txz
+	/sbin/makepkg -l y -c n $cwd/$name-wall-$version-$arch$build.txz
+	chown -R 1000:users $cwd/$name-wall-$version-$arch$build.txz
 }
 
-: "$*"; input=$( echo -e "${_// /\\n}" )
-args=$( grep    "\-\-" <<< $input )
-parm=$( grep -v "\-\-" <<< $input )
+
+# ### Detect distro. ###
 
 : "$( grep ^NAME /etc/os-release )"; : "${_#*=}"; distro=${_%%[ ]*}
 [ "$distro" == "" ] && distro=$( uname -s )
 
-[ ! "$parm" ] && {
-	: "$( head -105 $0 )"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"
-	exit 0
-}
+
+# ### Function for parameters and arguments mapping. ###
+
+for parms in $@; do
+
+	# ### Detect parameters. ###
+
+	case "$parms" in
+
+		--default)  DDE=disable
+					MATE=disable
+					GNOME=disable ;;
+
+		--enable-dde) DDE=enable ;;
+		--enable-mate) MATE=enable ;;
+		--enable-gnome) GNOME=enable ;;
+		--disable-dde) DDE=disable ;;
+		--disable-mate) MATE=disable ;;
+		--disable-gnome) GNOME=disable ;;
+		-h|--help) info_view ;;
+	esac
+
+	# ### Detect arguments. ###
+
+	case "$parms" in
+		--*) ;;
+		  *) args+=" $parms"
+	esac
+done
+
+
+# ### Control messages. ###
+
+[ ! "$args" ] && info_view
 
 [ "$UID" != 0 ] && {
 	echo -e "\n\e[31mThe ${0##*/} resouce requires administrative privileges!\e[m\n" >&2
 	exit 1
 }
 
-for OPTION in $args; do
 
-	[ "$OPTION" == "--default" ] && {
-		DDE=disable
-		MATE=disable
-		GNOME=disable
-	}
-	
-	[ "$OPTION" == "--enable-dde"    ] && DDE=enable
-	[ "$OPTION" == "--enable-mate"   ] && MATE=enable
-	[ "$OPTION" == "--enable-gnome"  ] && GNOME=enable
-	[ "$OPTION" == "--disable-dde"   ] && DDE=disable
-	[ "$OPTION" == "--disable-mate"  ] && MATE=disable
-	[ "$OPTION" == "--disable-gnome" ] && GNOME=disable
-done
+# ### Conversion step. ###
 
-for file in $parm; do
+for file in $args; do
+
+	# ### Message for file not found. ###
 
 	[ ! -e $file ] && {
 		echo -e "\n\e[31mThe \"$file\" file was not found!\e[m\n" >&2
@@ -269,13 +323,15 @@ for file in $parm; do
 	default_dir=$pkg/usr/share/xfce4/backdrops/
 	mkdir -p $tmp $pkg/{install,usr/share/{backgrounds/xfce,xfce4/backdrops,wallpapers}}
 	cabextract -d $tmp $file
-	
+
+	# ### Message for invalid file. ###
+
 	[ "$?" != 0 ] && {
 		echo -e "\n\e[31mThe \"$file\" file is invalid!\e[m\n" >&2
 		rm -rf $tmp $pkg
 		continue
 	}
-	
+
 	mv $tmp/DesktopBackground/* $default_dir
 	define_name
 	chown -R root:root $pkg

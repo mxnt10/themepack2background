@@ -2,7 +2,7 @@
 
 ## ### README - PT_BR ### ######################################################
 #                                                                              #
-# themepack2background v3.1 - Conversão de arquivos de tema do Windows         #
+# themepack2background v3.2 - Conversão de arquivos de tema do Windows         #
 # themepack e deskthemepack para pacotes do Linux deb, rpm e txz.              #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -54,7 +54,7 @@
 
 ## ### README - EN_US ### ######################################################
 #                                                                              #
-# themepack2background v3.1 - Conversion of Windows theme files themepack      #
+# themepack2background v3.2 - Conversion of Windows theme files themepack      #
 # and deskthemepack for Linux packages deb, rpm e txz.                         #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -103,28 +103,24 @@
 #                                                                              #
 ############################ ### Copyleft 2021  ### ############################
 
+
+# ### Default values. ###
+
 DDE=enable
-KDE=enable
 MATE=enable
-XFCE=enable
 GNOME=enable
 
-define_defaut()
+
+# ### Info function. ###
+
+info_view() 
 {
-	DDE=disable
-	MATE=disable
-	GNOME=disable
+	: "$( head -105 $0 )"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"
+	exit 0
 }
 
-fail_root()
-{
-	echo -e "\nThe ${0##*/} resouce requires administrative privileges!\n" >&2; exit 1
-}
 
-info_view()
-{
-	: "$(head -105 $0)"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"; exit 0
-}
+# ### Add package name in the names for image files. ###
 
 define_name()
 {
@@ -134,26 +130,23 @@ define_name()
 	done
 }
 
-dde_wall()
-{
-	mkdir -p /usr/share/wallpapers/deepin
-	cd /usr/share/wallpapers/deepin
-	for img in ../../xfce4/backdrops/$name*; do
-		ln -s "$img" .
-	done
-}
+
+# ### Gnome support. ###
 
 gnome_wall()
 {
 	mkdir -p /usr/share/backgrounds/gnome/$name
 	cd /usr/share/backgrounds/gnome/$name
+
 	for img in ../../../xfce4/backdrops/$name*; do
 		ln -s "$img" .
 	done
+
 	mkdir -p /usr/share/gnome-background-properties
 echo '<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
 <wallpapers>' > /usr/share/gnome-background-properties/gnome-$name.xml
+
 	for img in *; do
 	echo "  <wallpaper deleted=\"false\">
     <name>$img</name>
@@ -163,20 +156,27 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
     <options>zoom</options>
   </wallpaper>" >> /usr/share/gnome-background-properties/gnome-$name.xml
 	done
+
 	echo '</wallpapers>' >> /usr/share/gnome-background-properties/gnome-$name.xml
 }
+
+
+# ### Mate support. ###
 
 mate_wall()
 {
 	mkdir -p /usr/share/backgrounds/mate/$name
 	cd /usr/share/backgrounds/mate/$name
+
 	for img in ../../../xfce4/backdrops/$name*; do
 		ln -s "$img" .
 	done
+
 	mkdir -p /usr/share/mate-background-properties
 	echo '<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE wallpapers SYSTEM "mate-wp-list.dtd">
 <wallpapers>' > /usr/share/mate-background-properties/mate-$name.xml
+
 	for img in *; do
 	echo "    <wallpaper deleted=\"false\">
     <name>$img</name>
@@ -186,16 +186,32 @@ mate_wall()
     <options>zoom</options>
   </wallpaper>" >> /usr/share/mate-background-properties/mate-$name.xml
 	done
+
 	echo '</wallpapers>' >> /usr/share/mate-background-properties/mate-$name.xml
 }
 
+
+# ### KDE and DDE support. ###
+
 kde_wall()
 {
-	cd /usr/share/wallpapers
-	for img in ../xfce4/backdrops/$name*; do
+
+	kdedir=/usr/share/wallpapers
+
+	[ "$DDE" == "enable" ] && {
+		kdedir+=/deepin
+		bdir=../
+		mkdir -p $kdedir
+	}
+
+	cd $kdedir
+	for img in $bdir../xfce4/backdrops/$name*; do
 		ln -s "$img" .
 	done
 }
+
+
+# ### XFCE support. ###
 
 xfce_wall()
 {
@@ -205,31 +221,76 @@ xfce_wall()
 	done
 }
 
-[ -z "$1" ] && info_view
-[ "$UID" != 0 ] && fail_root
 
-: "$*"; in=$(echo -e "${_// /\\n}")
+# ### Function for parameters and arguments mapping. ###
 
-for OPTION in $(grep "\-\-" <<< $in); do
-	[ "$OPTION" == "--default"       ] && define_defaut
-	[ "$OPTION" == "--enable-dde"    ] && DDE=enable
-	[ "$OPTION" == "--enable-mate"   ] && MATE=enable
-	[ "$OPTION" == "--enable-gnome"  ] && GNOME=enable
-	[ "$OPTION" == "--disable-dde"   ] && DDE=disable
-	[ "$OPTION" == "--disable-mate"  ] && MATE=disable
-	[ "$OPTION" == "--disable-gnome" ] && GNOME=disable
+for parms in $@; do
+
+	# ### Detect parameters. ###
+
+	case "$parms" in
+
+		--default)  DDE=disable
+					MATE=disable
+					GNOME=disable ;;
+
+		--enable-dde) DDE=enable ;;
+		--enable-mate) MATE=enable ;;
+		--enable-gnome) GNOME=enable ;;
+		--disable-dde) DDE=disable ;;
+		--disable-mate) MATE=disable ;;
+		--disable-gnome) GNOME=disable ;;
+		-h|--help) info_view ;;
+	esac
+
+	# ### Detect arguments. ###
+
+	case "$parms" in
+		--*) ;;
+		  *) args+=" $parms"
+	esac
 done
 
-for file in $(grep -v "\-\-" <<< $in); do
+
+# ### Control messages. ###
+
+[ ! "$args" ] && info_view
+
+[ "$UID" != 0 ] && {
+	echo -e "\n\e[31mThe ${0##*/} resouce requires administrative privileges!\e[m\n" >&2
+	exit 1
+}
+
+
+# ### Conversion step. ###
+
+for file in $args; do
+
+	# ### Message for file not found. ###
+
+	[ ! -e $file ] && {
+		echo -e "\n\e[31mThe \"$file\" file was not found!\e[m\n" >&2
+		continue
+	}
+
 	: "${file##*/}"; name="${_%%.*}"
 	tmp=/tmp/$name
+	default_dir=/usr/share/xfce4/backdrops/
 	mkdir -p $tmp
 	cabextract -d $tmp $file
+	
+	# ### Message for invalid file. ###
+
+	[ "$?" != 0 ] && {
+		echo -e "\n\e[31mThe \"$file\" file is invalid!\e[m\n" >&2
+		rm -rf $tmp
+		continue
+	}
+	
 	define_name
-	mv $tmp/DesktopBackground/* /usr/share/xfce4/backdrops/
+	mv $tmp/DesktopBackground/* $default_dir
 	chown -R root:root /usr/share/xfce4/backdrops/$name*.*
 	chmod 644 /usr/share/xfce4/backdrops/$name*.*
-	[ "$DDE"  == "enable"  ] && dde_wall
 	[ "$MATE" == "enable"  ] && mate_wall
 	[ "$GNOME" == "enable" ] && gnome_wall
 	kde_wall
@@ -237,4 +298,5 @@ for file in $(grep -v "\-\-" <<< $in); do
 	rm -rf $tmp
 	cd $cwd
 done
+
 exit 0

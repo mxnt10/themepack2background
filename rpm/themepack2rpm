@@ -2,7 +2,7 @@
 
 ## ### README - PT_BR ### ######################################################
 #                                                                              #
-# themepack2background v3.1 - Conversão de arquivos de tema do Windows         #
+# themepack2background v3.2 - Conversão de arquivos de tema do Windows         #
 # themepack e deskthemepack para pacotes do Linux deb, rpm e txz.              #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -54,7 +54,7 @@
 
 ## ### README - EN_US ### ######################################################
 #                                                                              #
-# themepack2background v3.1 - Conversion of Windows theme files themepack      #
+# themepack2background v3.2 - Conversion of Windows theme files themepack      #
 # and deskthemepack for Linux packages deb, rpm e txz.                         #
 #                                                                              #
 # By Mauricio Ferrari                                                          #
@@ -103,48 +103,54 @@
 #                                                                              #
 ############################ ### Copyleft 2021  ### ############################
 
+
+# ### Variables for package generate. ###
+
 cwd=$PWD
 arch=noarch
 version=${version:-1.0}
 release=${release:-1}
 
+
+# ### Default values. ###
+
 DDE=enable
-KDE=enable
 MATE=enable
-XFCE=enable
 GNOME=enable
 
-define_defaut()
+
+# ### Info function. ###
+
+info_view() 
 {
-	DDE=disable
-	MATE=disable
-	GNOME=disable
+	: "$( head -105 $0 )"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"
+	exit 0
 }
 
-: "$(grep ^NAME /etc/os-release)"; : "${_#*=}"; distro=${_%%[ ]*}
-[ "$distro" == "" ] && distro=$( uname -s )
 
-fail_root()
-{
-	echo -e "\nThe ${0##*/} resouce requires administrative privileges!\n" >&2; exit 1
-}
-
-info_view()
-{
-	: "$(head -105 $0)"; : "${_//\# /}"; : "${_/!\/bin\/bash/}"; echo -e "${_//\#/}\n"; exit 0
-}
+# ### Add package name in the names for image files. ###
 
 define_name()
 {
-	cd $pkg/usr/share/xfce4/backdrops
+	cd $default_dir
 	for oldname in *; do
 		mv $oldname $name-$oldname
 	done
 }
 
+
+# ### Generate spec file. ###
+
 spec_gen()
 {
-echo "Summary: Package gererated from $file, by ${0##*/}.
+	kdedir=/usr/share/wallpapers
+
+	[ "$DDE" == "enable" ] && {
+		kdedir+=/deepin
+		mkdir -p $pkg/$kdedir
+	}
+
+	echo "Summary: Package gererated from $file, by ${0##*/}.
 Name: $name-wall
 Version: $version
 Release: $release
@@ -167,9 +173,7 @@ exit
 
 %attr(0644, root, root) /usr/share/xfce4/backdrops/*
 /usr/share/backgrounds/xfce/
-/usr/share/wallpapers/" > $npg/SPECS/$name-$version.spec
-
-[ "$DDE" == "enable" ] && echo "/usr/share/wallpapers/deepin/" >> $npg/SPECS/$name-$version.spec
+$kdedir" > $npg/SPECS/$name-$version.spec
 
 [ "$MATE" == "enable" ] && echo "/usr/share/mate-background-properties/
 /usr/share/backgrounds/mate/$name/" >> $npg/SPECS/$name-$version.spec
@@ -180,7 +184,7 @@ exit
 
 echo "%post
 
-cd /usr/share/wallpapers
+cd $kdedir
 for img in /usr/share/xfce4/backdrops/$name*; do
 	ln -s \"\$img\" .
 done
@@ -191,16 +195,12 @@ for img in /usr/share/xfce4/backdrops/$name*; do
 done
 " >> $npg/SPECS/$name-$version.spec
 
-[ "$DDE" == "enable" ] && echo "cd /usr/share/wallpapers/deepin
-for img in /usr/share/xfce4/backdrops/$name*; do
-	ln -s \"\$img\" .
-done
-" >> $npg/SPECS/$name-$version.spec
-
 [ "$GNOME" == "enable" ] && echo "cd /usr/share/backgrounds/gnome/$name
+
 for img in /usr/share/xfce4/backdrops/$name*; do
 	ln -s \"\$img\" .
 done
+
 echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE wallpapers SYSTEM \"gnome-wp-list.dtd\">
 <wallpapers>' > /usr/share/gnome-background-properties/gnome-$name.xml
@@ -219,9 +219,11 @@ echo '</wallpapers>' >> /usr/share/gnome-background-properties/gnome-$name.xml
 " >> $npg/SPECS/$name-$version.spec
 
 [ "$MATE" == "enable" ] && echo "cd /usr/share/backgrounds/mate/$name
+
 for img in /usr/share/xfce4/backdrops/$name*; do
 	ln -s \"\$img\" .
 done
+
 echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE wallpapers SYSTEM \"mate-wp-list.dtd\">
 <wallpapers>' > /usr/share/mate-background-properties/mate-$name.xml
@@ -242,16 +244,17 @@ echo '</wallpapers>' >> /usr/share/mate-background-properties/mate-$name.xml
 echo "%postun
 
 rm /usr/share/backgrounds/xfce/$name*
-rm /usr/share/wallpapers/$name*" >> $npg/SPECS/$name-$version.spec
+rm $kdedir/$name*" >> $npg/SPECS/$name-$version.spec
 
 [ "$MATE" == "enable" ] && echo "rm -r /usr/share/backgrounds/mate/$name
 rm /usr/share/mate-background-properties/mate-$name.xml" >> $npg/SPECS/$name-$version.spec
 
 [ "$GNOME" == "enable" ] && echo "rm -r /usr/share/backgrounds/gnome/$name
 rm /usr/share/gnome-background-properties/gnome-$name.xml"  >> $npg/SPECS/$name-$version.spec
-
-[ "$DDE" == "enable" ] && echo "rm /usr/share/wallpapers/deepin/$name*" >> $npg/SPECS/$name-$version.spec
 }
+
+
+# ### Create RPM package. ###
 
 create_rpm()
 {
@@ -262,32 +265,83 @@ create_rpm()
 	chown -R 1000:users $name-wall-$version-$release.$arch.rpm
 }
 
-[ -z "$1" ] && info_view
-[ "$UID" != 0 ] && fail_root
 
-: "$*"; in=$(echo -e "${_// /\\n}")
+# ### Detect distro. ###
 
-for OPTION in $(grep "\-\-" <<< $in); do
-	[ "$OPTION" == "--default"       ] && define_defaut
-	[ "$OPTION" == "--enable-dde"    ] && DDE=enable
-	[ "$OPTION" == "--enable-mate"   ] && MATE=enable
-	[ "$OPTION" == "--enable-gnome"  ] && GNOME=enable
-	[ "$OPTION" == "--disable-dde"   ] && DDE=disable
-	[ "$OPTION" == "--disable-mate"  ] && MATE=disable
-	[ "$OPTION" == "--disable-gnome" ] && GNOME=disable
+: "$( grep ^NAME /etc/os-release )"; : "${_#*=}"; distro=${_%%[ ]*}
+[ "$distro" == "" ] && distro=$( uname -s )
+
+
+# ### Function for parameters and arguments mapping. ###
+
+for parms in $@; do
+
+	# ### Detect parameters. ###
+
+	case "$parms" in
+
+		--default)  DDE=disable
+					MATE=disable
+					GNOME=disable ;;
+
+		--enable-dde) DDE=enable ;;
+		--enable-mate) MATE=enable ;;
+		--enable-gnome) GNOME=enable ;;
+		--disable-dde) DDE=disable ;;
+		--disable-mate) MATE=disable ;;
+		--disable-gnome) GNOME=disable ;;
+		-h|--help) info_view ;;
+	esac
+
+	# ### Detect arguments. ###
+
+	case "$parms" in
+		--*) ;;
+		  *) args+=" $parms"
+	esac
 done
 
-for file in $(grep -v "\-\-" <<< $in); do
+
+# ### Control messages. ###
+
+[ ! "$args" ] && info_view
+
+[ "$UID" != 0 ] && {
+	echo -e "\n\e[31mThe ${0##*/} resouce requires administrative privileges!\e[m\n" >&2
+	exit 1
+}
+
+
+# ### Conversion step. ###
+
+for file in $args; do
+
+	# ### Message for file not found. ###
+
+	[ ! -e $file ] && {
+		echo -e "\n\e[31mThe \"$file\" file was not found!\e[m\n" >&2
+		continue
+	}
+
 	: "${file##*/}"; name="${_%%.*}"
 	pkg=/tmp/package-$name
 	tmp=/tmp/$name
+	default_dir=$pkg/usr/share/xfce4/backdrops/
 	npg=~/rpmbuild
 	mkdir -p $tmp $pkg/usr/share/{backgrounds/xfce,xfce4/backdrops,wallpapers} $npg/SPECS
-	[ "$DDE"   == "enable" ] && mkdir -p $pkg/usr/share/wallpapers/deepin
 	[ "$MATE"  == "enable" ] && mkdir -p $pkg/usr/share/{backgrounds/mate/$name,mate-background-properties}
 	[ "$GNOME" == "enable" ] && mkdir -p $pkg/usr/share/{backgrounds/gnome/$name,gnome-background-properties}
 	cabextract -d $tmp $file
-	mv $tmp/DesktopBackground/* $pkg/usr/share/xfce4/backdrops/
+
+	# ### Message for invalid file. ###
+
+	[ "$?" != 0 ] && {
+		echo -e "\n\e[31mThe \"$file\" file is invalid!\e[m\n" >&2
+		rm -rf $tmp $pkg
+		continue
+	}
+
+	mv $tmp/DesktopBackground/* $default_dir
 	define_name
 	chown -R root:root $pkg
 	chmod -R u+w,go+r-w,a+X-s $pkg
