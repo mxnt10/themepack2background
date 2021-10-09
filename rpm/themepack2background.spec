@@ -2,7 +2,7 @@ Summary: Convert themepack file to Slackware package.
 
 Name: themepack2background
 Version: 3.2
-Release: 1
+Release: 2
 
 BuildArch: noarch
 

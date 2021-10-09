@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 3.2-2 ] - 2021-10-09 ################################################
+
+### Fixed / Corrigido
+	- themepack2txz:
+	  - Fix slack-desc create.
+###
+
+##########################################################################
+
+
 ## [ 3.2-1 ] - 2021-06-01 ################################################
 
 ### Added / Adicionado
@@ -24,6 +34,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 	- themepack2deb and themepack2rpm:
 		- Help not displayed when parameter was passed without a file.
 ###
+
+##########################################################################
 
 
 ## [ 3.1-1 ] - 2021-06-01 ################################################

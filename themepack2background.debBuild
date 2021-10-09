@@ -7,7 +7,7 @@
 
 PRGNAM=themepack2background
 VERSION=${VERSION:-3.2}
-RELEASE=${RELEASE:-1}
+RELEASE=${RELEASE:-2}
 
 ARCH=all
 

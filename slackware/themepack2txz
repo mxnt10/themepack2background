@@ -234,8 +234,7 @@ xfce_wall()
 slackdesc_gen()
 {
 	delm=$( printf "%${#name}s" " " )
-	echo "
-$delm     |-----handy-ruler------------------------------------------------------|
+	echo "$delm     |-----handy-ruler------------------------------------------------------|
 $name-wall: $name-wall (wallpaper for Slackware)
 $name-wall:
 $name-wall: Gererated from $file,
