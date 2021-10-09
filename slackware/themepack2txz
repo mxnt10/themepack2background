@@ -109,7 +109,7 @@
 cwd=$PWD
 arch=noarch
 version=${version:-1.0}
-build=${build:-_mxnt}
+build=${build:-1_mxnt}
 
 
 # ### Default values. ###
@@ -240,7 +240,7 @@ $name-wall:
 $name-wall: Gererated from $file,
 $name-wall: by ${0##*/}.
 $name-wall:
-$name-wall: Package created in $distro. 
+$name-wall: Package created in $distro.
 $name-wall:
 $name-wall:
 $name-wall:
@@ -254,8 +254,8 @@ $name-wall:" > $pkg/install/slack-desc
 create_txz()
 {
 	cd $pkg
-	/sbin/makepkg -l y -c n $cwd/$name-wall-$version-$arch$build.txz
-	chown -R 1000:users $cwd/$name-wall-$version-$arch$build.txz
+	/sbin/makepkg -l y -c n $cwd/$name-wall-$version-$arch-$build.txz
+	chown -R 1000:users $cwd/$name-wall-$version-$arch-$build.txz
 }
 
 
